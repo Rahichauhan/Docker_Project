@@ -1,0 +1,35 @@
+version: "3.8"
+services:
+  mongo:
+    image: mongo
+    container_name: mongo_c
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+  api:
+    build: ./api
+    container_name: api_c
+    ports:
+      - "4000:4000"
+    depends_on:
+      - mongo
+    volumes:
+      - ./api:/app
+      - /app/node_modules
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/notes
+  app:
+     build: ./app
+     container_name: client_c
+     ports:
+       - "3000:3000"
+     stdin_open: true
+     tty: true
+     depends_on:
+       - api
+     volumes:
+      - ./app:/app
+      - /app/node_modules
+volumes:
+  mongo-data:
